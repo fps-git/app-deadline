@@ -15,15 +15,18 @@ public class VerificationPage {
         verifyButton.shouldBe(visible);
     }
 
-    public DashboardPage validVerify(String verificationCode) {
+    private void verify(String verificationCode) {
         codeField.setValue(verificationCode);
         verifyButton.click();
+    }
+
+    public DashboardPage validVerify(String verificationCode) {
+        verify(verificationCode);
         return new DashboardPage();
     }
 
     public VerificationPage invalidVerify(String verificationCode) {
-        codeField.setValue(verificationCode);
-        verifyButton.click();
+        verify(verificationCode);
         $("[data-test-id='error-notification'] .notification__content")
                 .shouldHave(text("Ошибка! Неверно указан код! Попробуйте ещё раз."));
         return this;

@@ -11,30 +11,30 @@ import java.sql.DriverManager;
 public class DataHelper {
 
     @Value
-    public class UserData {
+    public static class UserData {
         String login;
         String password;
     }
 
-    String loginDB = "app";
-    String passwordDB = "pass";
+    static String loginDB = "app";
+    static String passwordDB = "pass";
 
-    Faker faker = new Faker();
+    private static Faker faker = new Faker();
 
-    public UserData getValidUserData() {
-        return new UserData("vasya", "qwerty123");
-    }
+        public static UserData getValidUserData() {
+            return new UserData("vasya", "qwerty123");
+        }
 
-    public UserData getInvalidPassUserData() {
+    public static UserData getInvalidPassUserData() {
         return new UserData("vasya", faker.internet().password());
     }
 
-    public UserData getNotRegisteredUserData() {
+    public static UserData getNotRegisteredUserData() {
         return new UserData(faker.name().username(), faker.internet().password());
     }
 
     @SneakyThrows
-    public String getValidVerificationCode(UserData user) {
+    public static String getValidVerificationCode(UserData user) {
         var runner = new QueryRunner();
         String verificationCode;
 
@@ -51,37 +51,7 @@ public class DataHelper {
         return verificationCode;
     }
 
-    public String getInvalidVerificationCode() {
+    public static String getInvalidVerificationCode() {
         return faker.numerify("######");
-    }
-
-    @SneakyThrows
-    public String getUserStatus(UserData user) {
-        var runner = new QueryRunner();
-        String status;
-
-        var getStatus = "SELECT status FROM users WHERE login = ?;";
-        try (
-                var conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", loginDB, passwordDB
-                );
-        ) {
-            status = runner.query(conn, getStatus, new ScalarHandler<>(), user.getLogin());
-        }
-        return status;
-    }
-
-    @SneakyThrows
-    public void setUserStatus(UserData user, String status) {
-        var runner = new QueryRunner();
-
-        var setStatus = "UPDATE users SET status= ? WHERE login = ?;";
-        try (
-                var conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", loginDB, passwordDB
-                );
-        ) {
-            runner.update(conn, setStatus, status, user.getLogin());
-        }
     }
 }
